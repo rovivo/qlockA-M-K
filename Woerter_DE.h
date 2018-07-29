@@ -39,9 +39,9 @@
 #define H_ZEHN       matrix[9] |= 0b1111000000000000
 
 //another eleven because of a fault in the laser plate
-//#define H_ELF        matrix[4] |= 0b0000011100000000
+#define H_ELF        matrix[4] |= 0b0000011100000000
 
-#define H_ELF         matrix[8] |= 0b0000000011100000 // result : ölf
+//#define H_ELF         matrix[8] |= 0b0000000011100000 // result : ölf
 
 //#define H_ELF         matrix[8] |= 0b0010000001100000 // result : e...lf
 
