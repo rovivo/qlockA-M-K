@@ -8,8 +8,7 @@
 class ColorSequencer
 {
 	public:
-		ColorSequencer(	unsigned short Hour, 
-						unsigned short color=0, 
+		ColorSequencer(	unsigned short color=0, 
 						unsigned long speed=1000, 
 						unsigned short maxBrightness=255, 
 						int minBrightnessSum=250, 
@@ -17,12 +16,11 @@ class ColorSequencer
 						unsigned short LedGreen = 100,
 						unsigned short LedBlue	= 150);
 
-		void call(bool init=false);
+		void call(unsigned short Hour, bool init=false);
 		void getNew();
 		RGB actualColor = {50,50,50};
 		
 	private:
-		unsigned short  ActHour;
 		unsigned short  colorSel;
 		unsigned long	tickSpeed;
 		unsigned short	maxBright;

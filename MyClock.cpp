@@ -1,5 +1,7 @@
 #include "MyClock.h"
 
+#define debug
+
 MyClock::MyClock(short _pinDCF, short _pinRTCEnable, Adafruit_NeoPixel* _neo){
 	pinDCF			= _pinDCF;
 	pinRTCEnable	= _pinRTCEnable;
@@ -8,9 +10,10 @@ MyClock::MyClock(short _pinDCF, short _pinRTCEnable, Adafruit_NeoPixel* _neo){
 
 void MyClock::setup(){
 	// Configuration
-	pinMode(pinRTCEnable, OUTPUT);
-	digitalWrite(pinRTCEnable, HIGH);
+	pinMode(pinRTCEnable, OUTPUT);	//nur sekundenblinker!
+	
 	pinMode(pinDCF, INPUT_PULLUP);
+	//pinMode(pinDCF, INPUT);
 	
 	Wire.begin();
 	
@@ -54,18 +57,29 @@ void MyClock::call(){
 	int lsb		= Wire.read();
 	rtcTemp		= ((msb << 2) + (lsb >> 6) ) / 4.0;
 
+	if (rtcSecond%2 == 0)
+		{digitalWrite(pinRTCEnable, HIGH);}
+	else 
+		{digitalWrite(pinRTCEnable, LOW);}
+
 	// Read Input & aux signals (DCF)
 	pinState = !digitalRead(pinDCF);
 	bool	sigPos	= pinState and !pinStateOld;
 	bool	sigNeg	= !pinState and pinStateOld;
 	pinStateOld		= pinState;
-	
+	#ifdef debug
+		Serial.print("pinState (pinDCF): ");
+		Serial.println(pinState);
+	#endif
+
 	// Signal detection
 	if(sigPos){
 		lastNeg = millis();
 		unsigned long timeFalse = lastNeg-lastPos;
-		//	Serial.print(" Sig-: ");
-		//	Serial.println(timeFalse);
+		#ifdef debug
+			Serial.print(" Sig-: ");
+			Serial.println(timeFalse);
+		#endif
 		if(timeFalse < 450){				// Pause was too short
 			bitstream_invalid = true;
 			Serial.print(" ! Sig- too short: ");
@@ -82,8 +96,10 @@ void MyClock::call(){
 	if(sigNeg){
 		lastPos = millis();
 		unsigned long timeTrue = lastPos-lastNeg;
-		//	Serial.print("               Sig+: ");
-		//	Serial.println(timeTrue);
+		#ifdef debug
+			Serial.print("               Sig+: ");
+			Serial.println(timeTrue);
+		#endif
 		if(timeTrue < 50){
 			bitstream_invalid = true;
 			stream_add(0);
@@ -148,8 +164,12 @@ void MyClock::stream_add(bool bit){
 void MyClock::stream_end(){
 	neo->setPixelColor(112, 100,0,0);
 	neo->setPixelColor(113, 100,0,0);
-	if(!bitstream_invalid)
+	if(!bitstream_invalid) {
 		stream_check();
+		#ifdef debug
+			Serial.println("Stream valid");
+		#endif
+		}
 	else
 		Serial.println("Stream invalid");
 

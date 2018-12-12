@@ -17,8 +17,8 @@
 	//	3. RGB LEDs von links nach rechts verkabelt (kürzester Weg)
 
 // Farben der LEDs
-	// Farbwechsel oder statische farbe? 0 = Farbwechsel, 1 = rot, 2 = grün, 3 = blau, 4 = weiss, 5 = individuell (MaxBrightness ohne funktion)
-	#define Color       		5
+	// Farbwechsel oder statische farbe? 0 = Farbwechsel, 1 = rot, 2 = grün, 3 = blau, 4 = weiss, 5 = individuell (MaxBrightness ohne funktion), 6 = nach Tageszeit
+	#define Color       		6
 	// Farbwechselgeschwindigkeit grössere Zahl = langsamerer Wechsel
 	#define ColorSpeed			1
 	// maximale helligkeit (1-255)
@@ -69,13 +69,14 @@
 #define MODE_ADDYEAR		7
 
 #define MODE_SCHWEIZ		8
+//#define MODE_HEART			8
 #define MODE_DAILY			9
 
 #define	MODE_SLEEP			20
 #define	MODE_WAKEUP			21
 
 // maximum states to choose with mode button
-#define maxState			7
+#define maxState			8	// 7 present everytime
 
 
 Adafruit_NeoPixel	neo		= Adafruit_NeoPixel(PIXELS_MAX,  PIN_NEOPIXEL,  NEO_GRB + NEO_KHZ800);
@@ -84,7 +85,7 @@ Input				inp		= Input(PIN_BTN_UP, PIN_BTN_MODE, PIN_BTN_DOWN);
 EventHandler		event	= EventHandler();
 
 // 
-ColorSequencer		seq		= ColorSequencer(0, Color, ColorSpeed, MaxBrightness, minBrightnessSum, LedRed, LedGreen, LedBlue);
+ColorSequencer		seq		= ColorSequencer(Color, ColorSpeed, MaxBrightness, minBrightnessSum, LedRed, LedGreen, LedBlue);
 
 PATTERN 			matrix;
 
@@ -104,7 +105,7 @@ void setup(){
 	pinMode(PIN_4MIN, OUTPUT);
 	///////////////////////////////////////////////////////
 	//# ADD EVENTS (-1 for all values)
-	//			MODE			Year	Month	Day		Hour 	Minute	Second		Weekday		// DD.MM.YYYY / HH:II:SS
+	//				MODE			Year	Month	Day		Hour 	Minute	Second		Weekday		// DD.MM.YYYY / HH:II:SS
 	//event.add(	MODE_TEMP,		-1,		-1,		-1,		-1,		-1,		26,			-1		);	// ??.??.???? / ??:??:30 // Temperaturanzeige
 
 	// Montag
@@ -130,6 +131,8 @@ void setup(){
 	//event.add(	MODE_SLEEP,		-1,		-1,		-1,		23,		 0,		 0,			 7		);	// GO SLEEP
 	
 	//event.add(	MODE_SCHWEIZ,	-1,		 8,		 1,		-1,		 0,		25,			-1		);
+
+	//event.add(	MODE_HEART,		-1,		 6,		10,		-1,		 0,		25,			-1		);
 	
 	//event.add(	MODE_NINA,		-1,		 6,		 5,		-1,		-1,		45,			-1		);
 	//event.add(	MODE_URS,		-1,		 7,		31,		-1,		-1,		45,			-1		);
@@ -161,7 +164,7 @@ void loop(){
 
 	// Funktions-Klassen
 	// color ColorSequencer
-	seq.call();
+	seq.call(Hour);
 
 	#ifdef debug
 		Serial.print("Time from RTC: ");
@@ -202,7 +205,9 @@ void loop(){
 		#endif
 	}
 	
+	// Modes +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	switch(state){
+		// adjust hour ---------------------------------------------------------------------------------
 		case MODE_ADDHOUR:{
 			if(inp.clickUp())
 				clk.addHour();
@@ -221,6 +226,7 @@ void loop(){
 			writeNeo(&matrix, &neo, &colorParamValue);
 			break;
 		}
+		// adjust minutes ------------------------------------------------------------------------------
 		case MODE_ADDMIN:{
 			if(inp.clickUp())
 				clk.addMinute();
@@ -239,6 +245,7 @@ void loop(){
 			writeNeo(&matrix, &neo, &colorParamValue);
 			break;
 		}
+		// adjust weekday (1-7) -----------------------------------------------------------------------
 		case MODE_ADDWDAY:{
 			if(inp.clickUp())
 				clk.addWday();
@@ -257,6 +264,7 @@ void loop(){
 			writeNeo(&matrix, &neo, &colorParamValue);
 			break;
 		}
+		// adjust calendar day ------------------------------------------------------------------------
 		case MODE_ADDDAY:{
 			if(inp.clickUp())
 				clk.addDay();
@@ -275,6 +283,7 @@ void loop(){
 			writeNeo(&matrix, &neo, &colorParamValue);
 			break;
 		}
+		// adjust calendar month ----------------------------------------------------------------------
 		case MODE_ADDMON:{
 			if(inp.clickUp())
 				clk.addMonth();
@@ -293,6 +302,7 @@ void loop(){
 			writeNeo(&matrix, &neo, &colorParamValue);
 			break;
 		}
+		// adjust calendar year ---------------------------------------------------------------------
 		case MODE_ADDYEAR:{
 			if(inp.clickUp())
 				clk.addYear();
@@ -340,6 +350,7 @@ void loop(){
 			writeNeo(&matrix, &neo, &col2);
 			break;
 		}
+		// ch flag ------------------------------------------------------------------------
 		case MODE_SCHWEIZ:{
 			if(tmrToclock.ton(true,10000)){
 				tmrToclock.ton(false);
@@ -373,7 +384,41 @@ void loop(){
 			writeNeo(&View_SchweizWhite, &neo, &white);
 			break;
 		}
-		
+		// MODE_HEART ------------------------------------------------------------------------
+		//case MODE_HEART:{
+		//	if(tmrToclock.ton(true,10000)){
+		//		tmrToclock.ton(false);
+		//		state = MODE_CLOCK;
+		//	}
+		//	const RGB white = {50,50,50};
+		//	const RGB red = {50,0,0};
+		//	const struct PATTERN 	View_HeartFull =  {
+		//		0b00111011100,
+		//		0b01111111110,
+		//		0b11111111111,
+		//		0b11111111111,
+		//		0b11111111111,
+		//		0b01111111110,
+		//		0b00111111100,
+		//		0b00011111000,
+		//		0b00001110000,
+		//		0b00000100000};
+		//	const struct PATTERN 	View_HeartLineBig =  {
+		//		0b00111011100,
+		//		0b01000100010,
+		//		0b10000100001,
+		//		0b10000000001,
+		//		0b10000000001,
+		//		0b01000000010,
+		//		0b00100000100,
+		//		0b00010001000,
+		//		0b00001010000,
+		//		0b00000100000};
+		//	writeNeo(&View_HeartFull, &neo, &red);
+		//	writeNeo(&View_HeartLineBig, &neo, &white);
+		//	break;
+		//}
+
 		case MODE_DCFDIAG:{
 			clk.view_stream();
 			if(tmrDiagPrintTime.ton(true,10000)){
@@ -382,6 +427,7 @@ void loop(){
 			}
 			break;
 		}
+		// standard clock mode  ------------------------------------------------------------------
 		case MODE_CLOCK:{
 			generateClockMatrix(&matrix, Hour, Minute);
 			writeNeo(&matrix, &neo, &seq.actualColor, true);

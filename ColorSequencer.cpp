@@ -1,9 +1,8 @@
 #include "ColorSequencer.h"
 
-#define debug
+//#define debug
 
-ColorSequencer::ColorSequencer(	unsigned short ActHour,
-								unsigned short color, 
+ColorSequencer::ColorSequencer(	unsigned short color, 
 								unsigned long speed,
 								unsigned short maxBrightness, 
 								int minBrightnessSum, 
@@ -21,7 +20,7 @@ ColorSequencer::ColorSequencer(	unsigned short ActHour,
 	lBlue			= LedBlue;
 }
 
-void ColorSequencer::call(bool init) {
+void ColorSequencer::call(unsigned short Hour, bool init) {
 	#ifdef debug
 		Serial.print("colorSel: ");
 		Serial.println(colorSel);
@@ -32,7 +31,7 @@ void ColorSequencer::call(bool init) {
 		actualColor.g	=	showColor.g;
 		actualColor.b	=	showColor.b;
 	}
-	else if (colorSel == 0) { 
+	else if (colorSel == 0) { 		// random color
 		if(tick.ton(true, tickSpeed)){
 			tick.ton(false);
 			if(actualColor.r > showColor.r)
@@ -79,6 +78,60 @@ void ColorSequencer::call(bool init) {
 		actualColor.r = showColor.r	= lRed;
 		actualColor.g = showColor.g	= lGreen;
 		actualColor.b = showColor.b	= lBlue;
+	}
+	else if (colorSel == 6) { 		// depends on time
+		if (Hour > 4 && Hour <= 6) {	// 4 hour to 6 hour
+			actualColor.r = showColor.r	= 0;
+			actualColor.g = showColor.g	= 245;
+			actualColor.b = showColor.b	= 255;
+		}
+		else if (Hour > 6 && Hour <= 8) {	// 6 hour to 8 hour
+			actualColor.r = showColor.r	= 193;
+			actualColor.g = showColor.g	= 255;
+			actualColor.b = showColor.b	= 193;
+		}
+		else if (Hour > 8 && Hour <= 10) {	// 8 hour to 10 hour
+			actualColor.r = showColor.r	= 0;
+			actualColor.g = showColor.g	= 255;
+			actualColor.b = showColor.b	= 0;
+		}
+		else if (Hour > 10 && Hour <= 12) {	// 10 hour to 12 hour
+			actualColor.r = showColor.r	= 255;
+			actualColor.g = showColor.g	= 255;
+			actualColor.b = showColor.b	= 0;
+		}
+		else if (Hour > 12 && Hour <= 14) {	// 12 hour to 14 hour
+			actualColor.r = showColor.r	= 255;
+			actualColor.g = showColor.g	= 48;
+			actualColor.b = showColor.b	= 48;
+		}
+		else if (Hour > 14 && Hour <= 16) {	// 14 hour to 16 hour
+			actualColor.r = showColor.r	= 255;
+			actualColor.g = showColor.g	= 52;
+			actualColor.b = showColor.b	= 179;
+		}
+		else if (Hour > 16 && Hour <= 18) {	// 16 hour to 18 hour
+			actualColor.r = showColor.r	= 191;
+			actualColor.g = showColor.g	= 62;
+			actualColor.b = showColor.b	= 255;
+		}
+		else if (Hour > 18 && Hour <= 20) {	// 18 hour to 20 hour
+			actualColor.r = showColor.r	= 131;
+			actualColor.g = showColor.g	= 111;
+			actualColor.b = showColor.b	= 255;
+		}
+		else if (Hour > 20 && Hour <= 22) {	// 20 hour to 22 hour
+			actualColor.r = showColor.r	= 0;
+			actualColor.g = showColor.g	= 0;
+			actualColor.b = showColor.b	= 255;
+		}
+		else {// (Hour > 22 || Hour <= 4) {		// 22 hour to 4 hour
+			actualColor.r = showColor.r	= 0;
+			actualColor.g = showColor.g	= 0;
+			actualColor.b = showColor.b	= 128;
+		}
+
+
 	}
 	else { 							// fallback
 		actualColor.r = showColor.r	= 10;
