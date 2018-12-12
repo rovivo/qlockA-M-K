@@ -68,8 +68,8 @@
 #define MODE_ADDMON			6
 #define MODE_ADDYEAR		7
 
-#define MODE_SCHWEIZ		8
-//#define MODE_HEART			8
+//#define MODE_SCHWEIZ		8
+#define MODE_HEART			8
 #define MODE_DAILY			9
 
 #define	MODE_SLEEP			20
@@ -132,7 +132,7 @@ void setup(){
 	
 	//event.add(	MODE_SCHWEIZ,	-1,		 8,		 1,		-1,		 0,		25,			-1		);
 
-	//event.add(	MODE_HEART,		-1,		 6,		10,		-1,		 0,		25,			-1		);
+	event.add(	MODE_HEART,		-1,		 6,		10,		-1,		 0,		25,			-1		);
 	
 	//event.add(	MODE_NINA,		-1,		 6,		 5,		-1,		-1,		45,			-1		);
 	//event.add(	MODE_URS,		-1,		 7,		31,		-1,		-1,		45,			-1		);
@@ -351,73 +351,74 @@ void loop(){
 			break;
 		}
 		// ch flag ------------------------------------------------------------------------
-		case MODE_SCHWEIZ:{
-			if(tmrToclock.ton(true,10000)){
-				tmrToclock.ton(false);
-				state = MODE_CLOCK;
-			}
-			const RGB white = {50,50,50};
-			const RGB red = {50,0,0};
-			const struct PATTERN 	View_SchweizWhite =  {
-				 0b00000000000,
-				 0b00001110000,
-				 0b00001110000,
-				 0b00001110000,
-				 0b01111111110,
-				 0b01111111110,
-				 0b01111111110,
-				 0b00001110000,
-				 0b00001110000,
-				 0b00001110000};
-			const struct PATTERN 	View_SchweizRed =  {
-				 0b11111111111,
-				 0b11110001111,
-				 0b11110001111,
-				 0b11110001111,
-				 0b10000000001,
-				 0b10000000001,
-				 0b10000000001,
-				 0b11110001111,
-				 0b11110001111,
-				 0b11110001111};
-			writeNeo(&View_SchweizRed, &neo, &red);
-			writeNeo(&View_SchweizWhite, &neo, &white);
-			break;
-		}
-		// MODE_HEART ------------------------------------------------------------------------
-		//case MODE_HEART:{
+		//case MODE_SCHWEIZ:{
 		//	if(tmrToclock.ton(true,10000)){
 		//		tmrToclock.ton(false);
 		//		state = MODE_CLOCK;
 		//	}
 		//	const RGB white = {50,50,50};
 		//	const RGB red = {50,0,0};
-		//	const struct PATTERN 	View_HeartFull =  {
-		//		0b00111011100,
-		//		0b01111111110,
-		//		0b11111111111,
-		//		0b11111111111,
-		//		0b11111111111,
-		//		0b01111111110,
-		//		0b00111111100,
-		//		0b00011111000,
-		//		0b00001110000,
-		//		0b00000100000};
-		//	const struct PATTERN 	View_HeartLineBig =  {
-		//		0b00111011100,
-		//		0b01000100010,
-		//		0b10000100001,
-		//		0b10000000001,
-		//		0b10000000001,
-		//		0b01000000010,
-		//		0b00100000100,
-		//		0b00010001000,
-		//		0b00001010000,
-		//		0b00000100000};
-		//	writeNeo(&View_HeartFull, &neo, &red);
-		//	writeNeo(&View_HeartLineBig, &neo, &white);
+		//	const struct PATTERN 	View_SchweizWhite =  {
+		//		 0b00000000000,
+		//		 0b00001110000,
+		//		 0b00001110000,
+		//		 0b00001110000,
+		//		 0b01111111110,
+		//		 0b01111111110,
+		//		 0b01111111110,
+		//		 0b00001110000,
+		//		 0b00001110000,
+		//		 0b00001110000};
+		//	const struct PATTERN 	View_SchweizRed =  {
+		//		 0b11111111111,
+		//		 0b11110001111,
+		//		 0b11110001111,
+		//		 0b11110001111,
+		//		 0b10000000001,
+		//		 0b10000000001,
+		//		 0b10000000001,
+		//		 0b11110001111,
+		//		 0b11110001111,
+		//		 0b11110001111};
+		//	writeNeo(&View_SchweizRed, &neo, &red);
+		//	writeNeo(&View_SchweizWhite, &neo, &white);
 		//	break;
 		//}
+		// MODE_HEART ------------------------------------------------------------------------
+		case MODE_HEART:{
+			if(tmrToclock.ton(true,10000)){
+				tmrToclock.ton(false);
+				state = MODE_CLOCK;
+			}
+			clearMatrix(110);
+			const RGB white = {50,50,50};
+			const RGB red = {50,0,0};
+			const struct PATTERN 	View_HeartFull =  {
+				0b00111011100,
+				0b01111111110,
+				0b11111111111,
+				0b11111111111,
+				0b11111111111,
+				0b01111111110,
+				0b00111111100,
+				0b00011111000,
+				0b00001110000,
+				0b00000100000};
+			const struct PATTERN 	View_HeartLineBig =  {
+				0b00111011100,
+				0b01000100010,
+				0b10000100001,
+				0b10000000001,
+				0b10000000001,
+				0b01000000010,
+				0b00100000100,
+				0b00010001000,
+				0b00001010000,
+				0b00000100000};
+			writeNeo(&View_HeartFull, &neo, &red);
+			writeNeo(&View_HeartLineBig, &neo, &white);
+			break;
+		}
 
 		case MODE_DCFDIAG:{
 			clk.view_stream();
