@@ -10,8 +10,8 @@ struct RGB {
 struct PATTERN {
 	int r[10];
 };
-
-const struct PATTERN 	View_Blank =  {
+// const struct PATTERN 	View_Blank  PROGMEM =  {  // to test 
+const struct PATTERN 	View_Blank  =  {
 	 0b00000000000,
 	 0b00000000000,
 	 0b00000000000,

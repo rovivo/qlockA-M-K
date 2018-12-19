@@ -91,6 +91,7 @@ PATTERN 			matrix;
 
 Timer				tmrDiagPrintTime;
 Timer				tmrToclock;
+Timer				tmrBlink;
 
 void setup(){
 	Serial.begin(9600);
@@ -132,15 +133,15 @@ void setup(){
 	
 	//event.add(	MODE_SCHWEIZ,	-1,		 8,		 1,		-1,		 0,		25,			-1		);
 
-	event.add(	MODE_HEART,		-1,		 6,		10,		-1,		 0,		25,			-1		);
+	event.add(	MODE_HEART,		-1,		 6,		10,		-1,		 -1,		25,			-1		);
 	
 	//event.add(	MODE_NINA,		-1,		 6,		 5,		-1,		-1,		45,			-1		);
 	//event.add(	MODE_URS,		-1,		 7,		31,		-1,		-1,		45,			-1		);
 	
-	Serial.println("QlockRovivoRGB");
-    Serial.print("compiled: ");
+	Serial.println(F("QlockRovivoRGB"));
+    Serial.print(F("compiled: "));
     Serial.print(__DATE__);
-	Serial.print(" ");
+	Serial.print(F(" "));
     Serial.println(__TIME__);
 	
 }
@@ -386,11 +387,15 @@ void loop(){
 		//}
 		// MODE_HEART ------------------------------------------------------------------------
 		case MODE_HEART:{
+            
+            // nach 10s automatisch wieder zu MODE_CLOCK wechseln
 			if(tmrToclock.ton(true,10000)){
 				tmrToclock.ton(false);
 				state = MODE_CLOCK;
 			}
-			clearMatrix(110);
+            
+            
+            
 			const RGB white = {50,50,50};
 			const RGB red = {50,0,0};
 			const struct PATTERN 	View_HeartFull =  {
@@ -415,9 +420,51 @@ void loop(){
 				0b00010001000,
 				0b00001010000,
 				0b00000100000};
-			writeNeo(&View_HeartFull, &neo, &red);
-			writeNeo(&View_HeartLineBig, &neo, &white);
+                
+            // blinker  400ms EIN - 400ms AUS
+            bool blinky = tmrBlink.blink(400,400);
+            if(blinky){
+                // herz in rot auf leds schreiben
+                clearMatrix(&matrix);
+                mergeMatrix(&matrix, &View_HeartFull);
+                writeNeo(&matrix, &neo, &red);
+            }
+            else{
+                // linie in weiss auf leds schreiben
+                clearMatrix(&matrix);
+                mergeMatrix(&matrix, &View_HeartLineBig);
+                writeNeo(&matrix, &neo, &white);
+            }
 			break;
+            
+            //################ für mehrere bilder ############
+            int x=0; // global!!!!!
+            if(tmrBlink.ton(true, 400)){
+                tmrBlink.ton(false);
+                x++;
+            }
+            switch(x){
+                case 1:{ // bild 1
+                    // code
+                    break;
+                }
+                case 2:{ // bild 2
+                    // code
+                    break;
+                }
+                case 3:{ // bild 3
+                    // code
+                    break;
+                }
+                default:{
+                    x=0;
+                    break;
+                }
+                
+            }
+            //################ für mehrere bilder ############
+            
+            
 		}
 
 		case MODE_DCFDIAG:{
