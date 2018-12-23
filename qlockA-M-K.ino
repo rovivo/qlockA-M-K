@@ -7,7 +7,6 @@
 #include "Timer.h"
 #include "MatrixFunctions.h"
 #include "ColorSequencer.h"
-#include "EventHandler.h"
 
 //#define debug
 
@@ -18,7 +17,7 @@
 
 // Farben der LEDs
 	// Farbwechsel oder statische farbe? 0 = Farbwechsel, 1 = rot, 2 = grün, 3 = blau, 4 = weiss, 5 = individuell (MaxBrightness ohne funktion), 6 = nach Tageszeit
-	#define Color       		6
+	#define Color       		5
 	// Farbwechselgeschwindigkeit grössere Zahl = langsamerer Wechsel
 	#define ColorSpeed			1
 	// maximale helligkeit (1-255)
@@ -26,9 +25,13 @@
 	// minimale helligkeit in Summe (nur bei Farbwechsler)
 	#define minBrightnessSum  250
 	// individuelle Farbe (Color muss 5 sein)	
-	#define LedRed			  240
-	#define LedGreen		  156
-	#define LedBlue 		  11
+	#define LedRed			  200
+	#define LedGreen		  200
+	#define LedBlue 		  200
+
+	// Herz wird 2 mal pro minute aufgerufen
+	byte H_Day 		= 23; 	//10
+	byte H_Month 	= 12; 	// 6
 
 // IOs
 	// Funkempfänger Uhr
@@ -83,7 +86,6 @@
 Adafruit_NeoPixel	neo		= Adafruit_NeoPixel(PIXELS_MAX,  PIN_NEOPIXEL,  NEO_GRB + NEO_KHZ800);
 MyClock 			clk		= MyClock(PIN_DCF, PIN_RTC_ON, &neo);
 Input				inp		= Input(PIN_BTN_UP, PIN_BTN_MODE, PIN_BTN_DOWN);
-EventHandler		event	= EventHandler();
 
 // 
 ColorSequencer		seq		= ColorSequencer(Color, ColorSpeed, MaxBrightness, minBrightnessSum, LedRed, LedGreen, LedBlue);
@@ -105,36 +107,6 @@ void setup(){
 	pinMode(PIN_2MIN, OUTPUT);
 	pinMode(PIN_3MIN, OUTPUT);
 	pinMode(PIN_4MIN, OUTPUT);
-	///////////////////////////////////////////////////////
-	//# ADD EVENTS (-1 for all values)
-	//				MODE			Year	Month	Day		Hour 	Minute	Second		Weekday		// DD.MM.YYYY / HH:II:SS
-	//event.add(	MODE_TEMP,		-1,		-1,		-1,		-1,		-1,		26,			-1		);	// ??.??.???? / ??:??:30 // Temperaturanzeige
-
-	// Montag
-	//event.add(	MODE_WAKEUP,	-1,		-1,		-1,		 6,		 0,		 0,			 1		);	// WAKE UP FROM SLEEP
-	//event.add(	MODE_SLEEP,		-1,		-1,		-1,		23,		 0,		 0,			 1		);	// GO SLEEP
-	// Dienstag
-	//event.add(	MODE_WAKEUP,	-1,		-1,		-1,		 6,		 0,		 0,			 2		);	// WAKE UP FROM SLEEP
-	//event.add(	MODE_SLEEP,		-1,		-1,		-1,		23,		 0,		 0,			 2		);	// GO SLEEP
-	// Mittwoch
-	//event.add(	MODE_WAKEUP,	-1,		-1,		-1,		 6,		 0,		 0,			 3		);	// WAKE UP FROM SLEEP
-	//event.add(	MODE_SLEEP,		-1,		-1,		-1,		23,		 0,		 0,			 3		);	// GO SLEEP
-	// Donnerstag
-	//event.add(	MODE_WAKEUP,	-1,		-1,		-1,		 6,		 0,		 0,			 4		);	// WAKE UP FROM SLEEP
-	//event.add(	MODE_SLEEP,		-1,		-1,		-1,		23,		 0,		 0,			 4		);	// GO SLEEP
-	// Freitag
-	//event.add(	MODE_WAKEUP,	-1,		-1,		-1,		 6,		 0,		 0,			 5		);	// WAKE UP FROM SLEEP
-	// Samstag
-	//event.add(	MODE_SLEEP,		-1,		-1,		-1,		 1,		 0,		 0,			 5		);	// GO SLEEP
-	//event.add(	MODE_WAKEUP,	-1,		-1,		-1,		 8,		30,		 0,			 6		);	// WAKE UP FROM SLEEP
-	// Sonntag
-	//event.add(	MODE_SLEEP,		-1,		-1,		-1,		 1,		 0,		 0,			 6		);	// GO SLEEP
-	//event.add(	MODE_WAKEUP,	-1,		-1,		-1,		 9,		 0,		 0,			 7		);	// WAKE UP FROM SLEEP
-	//event.add(	MODE_SLEEP,		-1,		-1,		-1,		23,		 0,		 0,			 7		);	// GO SLEEP
-	
-	//event.add(	MODE_SCHWEIZ,	-1,		 8,		 1,		-1,		 0,		25,			-1		);
-
-	event.add(	MODE_HEART,		-1,		 6,		10,		-1,		 -1,		25,			-1		);
 	
 	Serial.println(F("QlockRovivoRGB"));
     Serial.print(F("compiled: "));
@@ -180,10 +152,9 @@ void loop(){
 		Serial.println(Year);
 	#endif
 
-	// Event-Handler
-	action = event.check(Year, Month, Day, Hour, Minute, Second, Wday);
-	if(action and state == MODE_CLOCK){
-		state = action;
+	// Heart activator
+	if(H_Day == Day and H_Month == Month and (Second == 15 or Second == 45)){
+		state = MODE_HEART;
 	}
 	
 	// Inputs & allgemeines
@@ -441,7 +412,6 @@ void loop(){
             if(tmrBlink.ton(true, 1000)){
                 tmrBlink.ton(false);
                 HeartCount++;
-				Serial.println(HeartCount);
             }
             switch(HeartCount){
 				case 0:{ // kleines Herz
@@ -453,14 +423,13 @@ void loop(){
                 }
 
                 case 1:{ // linie in weiss auf leds schreiben
-					//writeNeo(&View_Full, &neo, &off);
 					clearMatrix(&matrix);
-					mergeMatrix(&matrix, &View_HeartLineMiddle);
+					mergeMatrix(&matrix, &View_HeartLineBig);
 					writeNeo(&matrix, &neo, &red);
                     break;
 				}
 
-                case 2:{ // bild 1
+                case 2:{ // volles Herz
 					writeNeo(&View_Full, &neo, &off);
 					clearMatrix(&matrix);
 					mergeMatrix(&matrix, &View_HeartFull);
@@ -469,7 +438,6 @@ void loop(){
                 }
 
                 case 3:{ // linie in weiss auf leds schreiben
-					//writeNeo(&View_Full, &neo, &off);
 					clearMatrix(&matrix);
 					mergeMatrix(&matrix, &View_HeartLineBig);
 					writeNeo(&matrix, &neo, &white);
@@ -477,9 +445,15 @@ void loop(){
                 }
 
 				case 4:{ // kleines Herz
-                    //writeNeo(&View_Full, &neo, &white);
 					clearMatrix(&matrix);
 					mergeMatrix(&matrix, &View_HeartLineMiddle);
+					writeNeo(&matrix, &neo, &white);
+                    break;
+                }
+
+				case 5:{ // volles Herz
+					clearMatrix(&matrix);
+					mergeMatrix(&matrix, &View_HeartFull);
 					writeNeo(&matrix, &neo, &white);
                     break;
                 }
