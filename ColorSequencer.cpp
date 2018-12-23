@@ -4,11 +4,11 @@
 
 ColorSequencer::ColorSequencer(	unsigned short color, 
 								unsigned long speed,
-								unsigned short maxBrightness, 
-								int minBrightnessSum, 
-								unsigned short LedRed, 
-								unsigned short LedGreen,
-								unsigned short LedBlue)
+								byte maxBrightness, 
+								byte minBrightnessSum, 
+								byte LedRed, 
+								byte LedGreen,
+								byte LedBlue)
 								{
 	tick.ton(false);
 	colorSel		= color;

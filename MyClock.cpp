@@ -175,14 +175,14 @@ void MyClock::stream_end(){
 
 	bitstream_invalid = false;
 	bitstream_idx = 0;
-	for(int i=0; i<MYCLOCK_STREAMLEN; i++)
+	for(byte i=0; i<MYCLOCK_STREAMLEN; i++)
 		bitstream[i] = 0;
 }
 
 void MyClock::view_stream(){
 	short pixel = 0;
-	for(int n=0; n<MYCLOCK_STREAMLEN; n++){
-		for(int i=0; i<8; i++){
+	for(byte n=0; n<MYCLOCK_STREAMLEN; n++){
+		for(byte i=0; i<8; i++){
 			if(bitstream_idx > (n*8 + i)){
 				if(bitstream[n] & (1 <<  i))
 					neo->setPixelColor(pixel++, 0,50,0);
@@ -225,7 +225,7 @@ void MyClock::stream_check(){
 		return;
 	}
 	
-	for(int n=0; n<60; n++){
+	for(byte n=0; n<60; n++){
 		short idx = n/8;
 		short bit = n%8;
 		bool b = (bitstream[idx] & (1 <<  bit));

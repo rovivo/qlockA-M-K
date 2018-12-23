@@ -10,11 +10,11 @@ class ColorSequencer
 	public:
 		ColorSequencer(	unsigned short color=0, 
 						unsigned long speed=1000, 
-						unsigned short maxBrightness=255, 
-						int minBrightnessSum=250, 
-						unsigned short LedRed	=  50, 
-						unsigned short LedGreen = 100,
-						unsigned short LedBlue	= 150);
+						byte maxBrightness=255, 
+						byte minBrightnessSum=250, 
+						byte LedRed		=  50, 
+						byte LedGreen 	= 100,
+						byte LedBlue	= 150);
 
 		void call(unsigned short Hour, bool init=false);
 		void getNew();
@@ -23,11 +23,11 @@ class ColorSequencer
 	private:
 		unsigned short  colorSel;
 		unsigned long	tickSpeed;
-		unsigned short	maxBright;
-		int				minBrightSum;
-		unsigned short  lRed;
-		unsigned short  lGreen;
-		unsigned short  lBlue;
+		byte  maxBright;
+		byte  minBrightSum;
+		byte  lRed;
+		byte  lGreen;
+		byte  lBlue;
 		RGB showColor = {50,50,50};
 		Timer tick;
 

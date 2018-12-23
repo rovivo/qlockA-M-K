@@ -136,9 +136,6 @@ void setup(){
 
 	event.add(	MODE_HEART,		-1,		 6,		10,		-1,		 -1,		25,			-1		);
 	
-	//event.add(	MODE_NINA,		-1,		 6,		 5,		-1,		-1,		45,			-1		);
-	//event.add(	MODE_URS,		-1,		 7,		31,		-1,		-1,		45,			-1		);
-	
 	Serial.println(F("QlockRovivoRGB"));
     Serial.print(F("compiled: "));
     Serial.print(__DATE__);
@@ -147,8 +144,8 @@ void setup(){
 	
 }
 
-unsigned short state=0;
-int action=0;
+byte state=0;
+byte action=0;
 
 void loop(){
 	// Haupt-Klassen
