@@ -1,6 +1,6 @@
 #include "MyClock.h"
 
-#define debug
+//#define debug
 
 MyClock::MyClock(short _pinDCF, short _pinRTCEnable, Adafruit_NeoPixel* _neo){
 	pinDCF			= _pinDCF;

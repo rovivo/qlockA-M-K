@@ -57,6 +57,7 @@
 	#define PIN_3MIN			12
 	#define PIN_4MIN			11
 
+ 	byte HeartCount=0;
 
 // Verfügbare Funktionen
 #define	MODE_CLOCK			0
@@ -385,19 +386,13 @@ void loop(){
 		//	writeNeo(&View_SchweizWhite, &neo, &white);
 		//	break;
 		//}
+
 		// MODE_HEART ------------------------------------------------------------------------
 		case MODE_HEART:{
             
-            // nach 10s automatisch wieder zu MODE_CLOCK wechseln
-			if(tmrToclock.ton(true,10000)){
-				tmrToclock.ton(false);
-				state = MODE_CLOCK;
-			}
-            
-            
-            
 			const RGB white = {50,50,50};
 			const RGB red = {50,0,0};
+			const RGB off = {0,0,0};
 			const struct PATTERN 	View_HeartFull =  {
 				0b00111011100,
 				0b01111111110,
@@ -420,50 +415,86 @@ void loop(){
 				0b00010001000,
 				0b00001010000,
 				0b00000100000};
+			const struct PATTERN 	View_HeartLineSmall =  {
+				0b00000000000,
+				0b00000000000,
+				0b00000000000,
+				0b00001010000,
+				0b00011111000,
+				0b00001110000,
+				0b00000100000,
+				0b00000000000,
+				0b00000000000,
+				0b00000000000};
+
+			const struct PATTERN 	View_HeartLineMiddle =  {
+				0b00000000000,
+				0b00111011100,
+				0b01000100010,
+				0b01000000010,
+				0b01000000010,
+				0b00100000100,
+				0b00010001000,
+				0b00001010000,
+				0b00000100000,
+				0b00000000000};
+
                 
-            // blinker  400ms EIN - 400ms AUS
-            bool blinky = tmrBlink.blink(400,400);
-            if(blinky){
-                // herz in rot auf leds schreiben
-                clearMatrix(&matrix);
-                mergeMatrix(&matrix, &View_HeartFull);
-                writeNeo(&matrix, &neo, &red);
-            }
-            else{
-                // linie in weiss auf leds schreiben
-                clearMatrix(&matrix);
-                mergeMatrix(&matrix, &View_HeartLineBig);
-                writeNeo(&matrix, &neo, &white);
-            }
-			break;
-            
-            //################ für mehrere bilder ############
-            int x=0; // global!!!!!
-            if(tmrBlink.ton(true, 400)){
+            ////################ für mehrere bilder ############
+            if(tmrBlink.ton(true, 1000)){
                 tmrBlink.ton(false);
-                x++;
+                HeartCount++;
+				Serial.println(HeartCount);
             }
-            switch(x){
-                case 1:{ // bild 1
-                    // code
+            switch(HeartCount){
+				case 0:{ // kleines Herz
+                    writeNeo(&View_Full, &neo, &white);
+					clearMatrix(&matrix);
+					mergeMatrix(&matrix, &View_HeartLineSmall);
+					writeNeo(&matrix, &neo, &red);
                     break;
                 }
-                case 2:{ // bild 2
-                    // code
+
+                case 1:{ // linie in weiss auf leds schreiben
+					//writeNeo(&View_Full, &neo, &off);
+					clearMatrix(&matrix);
+					mergeMatrix(&matrix, &View_HeartLineMiddle);
+					writeNeo(&matrix, &neo, &red);
+                    break;
+				}
+
+                case 2:{ // bild 1
+					writeNeo(&View_Full, &neo, &off);
+					clearMatrix(&matrix);
+					mergeMatrix(&matrix, &View_HeartFull);
+					writeNeo(&matrix, &neo, &red);
+					break;
+                }
+
+                case 3:{ // linie in weiss auf leds schreiben
+					//writeNeo(&View_Full, &neo, &off);
+					clearMatrix(&matrix);
+					mergeMatrix(&matrix, &View_HeartLineBig);
+					writeNeo(&matrix, &neo, &white);
                     break;
                 }
-                case 3:{ // bild 3
-                    // code
+
+				case 4:{ // kleines Herz
+                    //writeNeo(&View_Full, &neo, &white);
+					clearMatrix(&matrix);
+					mergeMatrix(&matrix, &View_HeartLineMiddle);
+					writeNeo(&matrix, &neo, &white);
                     break;
                 }
                 default:{
-                    x=0;
+                    HeartCount=0;
+					state = MODE_CLOCK;
                     break;
                 }
                 
             }
             //################ für mehrere bilder ############
-            
+            break;
             
 		}
 
