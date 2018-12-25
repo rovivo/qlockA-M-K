@@ -30,8 +30,8 @@
 	#define LedBlue 		  200
 
 	// Herz wird 2 mal pro minute aufgerufen
-	byte H_Day 		= 23; 	//10
-	byte H_Month 	= 12; 	// 6
+	byte H_Day 		= 10;
+	byte H_Month 	=  6;
 
 // IOs
 	// Funkempfänger Uhr
@@ -359,7 +359,7 @@ void loop(){
 		case MODE_HEART:{
             
 			const RGB white = {50,50,50};
-			const RGB red = {50,0,0};
+			const RGB red = {150,0,0};
 			const RGB off = {0,0,0};
 			const struct PATTERN 	View_HeartFull =  {
 				0b00111011100,
